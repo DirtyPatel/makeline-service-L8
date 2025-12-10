@@ -29,19 +29,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker Image
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_IMAGE_NAME: ${{ vars.DOCKER_IMAGE_NAME }}
-        run: |
-          docker build -t $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:test .
+     - name: Build Docker Image
+      uses: docker/build-push-action@v3
+      with:
+    context: .
+    push: false
+    tags: ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:test
 
-      - name: Push Docker Image
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_IMAGE_NAME: ${{ vars.DOCKER_IMAGE_NAME }}
-        run: |
-          docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:test
+
+  - name: Push Docker Image
+  uses: docker/build-push-action@v3
+  with:
+    context: .
+    push: true
+    tags: ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_IMAGE_NAME }}:test
+
 
   # Step 2: Test Job (Integration Tests)
   # Run automated tests against the containerized application to ensure it behaves as expected.
